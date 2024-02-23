@@ -1,0 +1,38 @@
+// Este é um código que conecta o celular ao ESP32 via bluetooth e utiliza um App do APP Inventor para controlá-lo.
+
+#include "BluetoothSerial.h"
+BluetoothSerial SerialBT;
+String device_name = "ESP32-BT";
+int in1 = 27; // aa
+int in2 = 26; // ab
+int in3 = 25; // ab
+int in4 = 33; // bb
+void setup() {
+ Serial.begin(115200);
+ SerialBT.begin(device_name);
+ Serial.printf("O Device de nome \"%s\" foi iniciado.\nAgora pode se conectar ao Bluetooth!\n", 
+device_name.c_str());
+ pinMode(2, OUTPUT);Serial.begin(9600);
+ pinMode(in1, OUTPUT);
+ pinMode(in2, OUTPUT);
+ pinMode(in3, OUTPUT);
+ pinMode(in4, OUTPUT);
+}
+void loop() {
+ if (SerialBT.available()) {
+ char c = SerialBT.read();
+ if(c=='1'){
+ digitalWrite(in1, HIGH);
+ digitalWrite(in3, HIGH); 
+ digitalWrite(in2, LOW);
+ digitalWrite(in4, LOW);
+ digitalWrite(2, HIGH);
+ }else if (c=='0'){
+ digitalWrite(in1, LOW);
+ digitalWrite(in3, LOW); 
+ digitalWrite(in2, HIGH);
+ digitalWrite(in4, HIGH);
+ digitalWrite(2, LOW);
+ }
+ }
+}
