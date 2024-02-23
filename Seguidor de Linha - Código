@@ -1,0 +1,77 @@
+// Este é o código recebe os sinais dos sensores de luz do carrinho em números (135, que significa "luz" e 4095, que significa "escuro", ou seja, a fita isolante) e de acordo com sua leitura, manda o carrinho seguir em frente ou direita/esquerda.
+
+int sensorD =34;
+int sensorE =32;
+
+
+int in1 = 33; // aa
+int in2 = 25; // ab
+int in3 = 26; // ba
+int in4 = 27; // bb
+
+
+void frente(){
+ 
+  digitalWrite(in1, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in2, HIGH);
+  digitalWrite(in4, HIGH);
+ 
+}
+
+void esquerda(){
+ 
+  digitalWrite(in1, LOW);
+  digitalWrite(in3, HIGH);
+  digitalWrite(in2, HIGH);
+  digitalWrite(in4, LOW); 
+}
+
+void direita(){
+
+  digitalWrite(in1, HIGH);
+  digitalWrite(in3, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in4, HIGH);
+}
+
+
+
+
+void setup() {
+  Serial.begin(9600);
+ 
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+
+
+}
+
+
+void loop() {
+  int estadoD = digitalRead(sensorD);
+  int estadoE = digitalRead(sensorE);
+
+
+  Serial.println("Direita: ");
+  Serial.println(digitalRead(sensorD));
+  Serial.println("Esquerda: ");
+  Serial.println(digitalRead(sensorE));
+ 
+  if(estadoD < 4095 && estadoE < 4095) {
+    frente();
+  }
+  if(estadoD < 4095 && estadoE == 4095) {
+    esquerda();
+  }
+  if(estadoD == 4095 && estadoE < 4095) {
+    direita();
+  }
+  if (estadoD == 4095 && estadoE == 4095) {
+    frente();
+  }
+
+
+  }
