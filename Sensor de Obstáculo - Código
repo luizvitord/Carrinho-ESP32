@@ -1,0 +1,174 @@
+// Este código pega as informações do sensor ultrassônico do carrinho e para quando chega a 30cm de distância de um obstáculo. Após isso, utilizando um Servo Motor, o carrinho gira o sensor ultrassônico em 180 graus e armazena a distância de cada ângulo, para então
+ir ao caminho de maior distância, ou seja, sem obstáculos.
+
+#include <ESP32_Servo.h>
+    Servo servo;
+    int i = 0;
+    int anguloMaior = 0;
+
+    int triggerPin = 35;
+    int echoPin = 32 ;
+    int distancia_nova = 0;
+    int in1 = 25; // aa
+    int in2 = 33; // ab
+    int in3 = 27; // ba
+    int in4 = 26; // bb
+    int tempo = millis();
+
+    void setup() {
+    servo.attach(19, 500, 2500);
+    Serial.begin(9600);
+    pinMode(in1, OUTPUT);
+    pinMode(in2, OUTPUT);
+    pinMode(in3, OUTPUT);
+    pinMode(in4, OUTPUT);
+
+    pinMode(triggerPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+
+    }
+
+    void frente(){
+      
+      digitalWrite(in1, LOW);
+      digitalWrite(in3, LOW); 
+      digitalWrite(in2, HIGH);
+      digitalWrite(in4, HIGH);
+      
+    }
+      void tras(){
+      
+      digitalWrite(in1, HIGH);
+      digitalWrite(in3, HIGH); 
+      digitalWrite(in2, LOW);
+      digitalWrite(in4, LOW);
+      
+    }
+    void esquerda(){
+      
+      digitalWrite(in1, LOW);
+      digitalWrite(in3, HIGH); 
+      digitalWrite(in2, HIGH);
+      digitalWrite(in4, LOW);
+      
+    }
+    void direita(){
+
+      digitalWrite(in1, HIGH);
+      digitalWrite(in3, LOW); 
+      digitalWrite(in2, LOW);
+      digitalWrite(in4, HIGH);
+
+    }
+
+   
+    void parado(){
+      
+      digitalWrite(in1, LOW);
+      digitalWrite(in3, LOW); 
+      digitalWrite(in2, LOW);
+      digitalWrite(in4, LOW);
+      
+    }
+  
+    void loop() {
+    frente();
+    Serial.print("FRENTE ");
+          delay(300);
+    float distancia = readUltrasonicDistance(echoPin,triggerPin);
+
+    Serial.println(distancia);
+    i = 0;
+
+
+    
+    if(distancia < 30){
+    parado();
+    delay(100);
+            int tempoatual = millis();
+    while(millis()<=tempoatual+650)
+    {
+      tras();
+          Serial.print("T ");
+
+    }
+    parado();
+      while(i<180)
+    {
+          float distancia_nova =readUltrasonicDistance(echoPin,triggerPin);
+
+      servo.write(i);
+        delay(300);
+        Serial.println(i);
+        Serial.println(distancia_nova);
+
+      i=i+10;
+
+        if(distancia_nova > distancia) {
+            distancia = distancia_nova;
+            anguloMaior=i;
+            }
+    }
+    i=0;
+    distancia_nova=0;
+      Serial.println(distancia);
+        Serial.println(anguloMaior);
+          servo.write(85);
+
+
+    delay(100);   
+      servo.write(85);
+
+
+
+    if (anguloMaior <= 90 ) {
+        int tempoatual = millis();
+    while (millis()<=tempoatual+300 )
+    {
+             Serial.print("D ");
+              esquerda();  }
+    } 
+    if (anguloMaior > 90 ){
+            int tempoatual = millis();
+
+      while (millis()<=tempoatual+300)
+    {
+              // Serial.println(millis()+" Tempo atual ");
+                  Serial.print("E ");
+          direita();
+    }
+
+   
+    }
+    
+      parado();
+      delay(1000);
+    }// acaba o if
+
+
+
+
+
+
+    }
+
+
+    
+
+    
+    float readUltrasonicDistance(int triggerPin, int echoPin)
+    {
+      pinMode(triggerPin, OUTPUT);
+      digitalWrite(triggerPin, LOW);
+      delayMicroseconds(2);
+      digitalWrite(triggerPin, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(triggerPin, LOW);
+      pinMode(echoPin, INPUT);
+      
+      // Calcula a distância em centímetros
+      float duration = pulseIn(echoPin, HIGH);
+      float distance = (duration / 2.0) * 0.0343; // Converte para centímetros
+      
+      return distance;
+    }
